@@ -22,8 +22,8 @@ function App() {
 
   async function createNote() {
     if (!formData.name || !formData.description) return;
-    var res = await API.graphql({ query: createNoteMutation, variables: { input: formData } });
-    var obj = res.data.createNote;
+    const apiData = await API.graphql({ query: createNoteMutation, variables: { input: formData } });
+    const obj = apiData.data.createNote;
     setNotes([ ...notes, obj ]);
     setFormData(initialFormState);
   }

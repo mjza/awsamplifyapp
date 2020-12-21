@@ -2,18 +2,30 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import { API, Storage } from 'aws-amplify';
 import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
-import { listNotes } from './graphql/queries';
+import { listNotes, listNoteTypes } from './graphql/queries';
 import { createNote as createNoteMutation, deleteNote as deleteNoteMutation } from './graphql/mutations';
 
-const initialFormState = { name: '', description: '' }
+const initialFormState = { name: '', description: '', noteNoteTypeId: '' }
 
 function App() {
   const [notes, setNotes] = useState([]);
+  const [noteTypes, setNoteTypes] = useState([]);
   const [formData, setFormData] = useState(initialFormState);
+
+  useEffect(() => {
+    fetchNoteTypes();
+  }, []);
 
   useEffect(() => {
     fetchNotes();
   }, []);
+
+  async function fetchNoteTypes() {
+    const apiData = await API.graphql({ query: listNoteTypes });
+    var items = apiData.data.listNoteTypes.items;
+    items.splice(0, 0, {id: "", name:""});
+    setNoteTypes(items);
+  } 
 
   async function fetchNotes() {
     const apiData = await API.graphql({ query: listNotes });
@@ -54,6 +66,12 @@ function App() {
     fetchNotes();
   }
 
+  async function onChangeSelect(e) {
+    var id = e.target.value;
+    setFormData({ ...formData, noteNoteTypeId: id });
+    fetchNotes();
+  }
+
   return (
     <div className="App">
       <h1>My Notes App</h1>
@@ -71,6 +89,13 @@ function App() {
         type="file"
         onChange={onChange}
       />
+      <select onChange={onChangeSelect} value={formData.noteNoteTypeId}>
+        {
+          noteTypes.map(noteType => (
+            <option value={noteType.id} key={noteType.id}>{noteType.name}</option>
+          ))
+        }
+      </select>
       <button onClick={createNote}>Create Note</button>
       <div style={{marginBottom: 30}}>
         {

@@ -10,6 +10,12 @@ export const onCreateNote = /* GraphQL */ `
       image
       createdAt
       updatedAt
+      NoteType {
+        id
+        name
+        createdAt
+        updatedAt
+      }
     }
   }
 `;
@@ -22,6 +28,12 @@ export const onUpdateNote = /* GraphQL */ `
       image
       createdAt
       updatedAt
+      NoteType {
+        id
+        name
+        createdAt
+        updatedAt
+      }
     }
   }
 `;
@@ -32,6 +44,42 @@ export const onDeleteNote = /* GraphQL */ `
       name
       description
       image
+      createdAt
+      updatedAt
+      NoteType {
+        id
+        name
+        createdAt
+        updatedAt
+      }
+    }
+  }
+`;
+export const onCreateNoteType = /* GraphQL */ `
+  subscription OnCreateNoteType {
+    onCreateNoteType {
+      id
+      name
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onUpdateNoteType = /* GraphQL */ `
+  subscription OnUpdateNoteType {
+    onUpdateNoteType {
+      id
+      name
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onDeleteNoteType = /* GraphQL */ `
+  subscription OnDeleteNoteType {
+    onDeleteNoteType {
+      id
+      name
       createdAt
       updatedAt
     }

@@ -10,6 +10,12 @@ export const getNote = /* GraphQL */ `
       image
       createdAt
       updatedAt
+      NoteType {
+        id
+        name
+        createdAt
+        updatedAt
+      }
     }
   }
 `;
@@ -27,8 +33,41 @@ export const listNotes = /* GraphQL */ `
         image
         createdAt
         updatedAt
+        NoteType {
+          id
+          name
+          createdAt
+          updatedAt
+        }
       }
       nextToken
+    }
+  }
+`;
+export const listNoteTypes = /* GraphQL */ `
+  query ListNoteTypes(
+    $filter: ModelNoteTypeFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listNoteTypes(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        name
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
+export const getNoteType = /* GraphQL */ `
+  query GetNoteType($id: ID!) {
+    getNoteType(id: $id) {
+      id
+      name
+      createdAt
+      updatedAt
     }
   }
 `;

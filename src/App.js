@@ -29,7 +29,6 @@ function App() {
   }
 
   async function deleteNote({ id }) {
-    console.log(id);
     await API.graphql({ query: deleteNoteMutation, variables: { input: { id } }});
     const newNotesArray = notes.filter(note => note.id !== id);
     setNotes(newNotesArray);    

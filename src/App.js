@@ -2,58 +2,60 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import { API } from 'aws-amplify';
 import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
-import { listTodos } from './graphql/queries';
-import { createTodo as createTodoMutation, deleteTodo as deleteTodoMutation } from './graphql/mutations';
+import { listNotes } from './graphql/queries';
+import { createNote as createNoteMutation, deleteNote as deleteNoteMutation } from './graphql/mutations';
 
 const initialFormState = { name: '', description: '' }
 
 function App() {
-  const [todos, setTodos] = useState([]);
+  const [notes, setNotes] = useState([]);
   const [formData, setFormData] = useState(initialFormState);
 
   useEffect(() => {
-    fetchTodos();
+    fetchNotes();
   }, []);
 
-  async function fetchTodos() {
-    const apiData = await API.graphql({ query: listTodos });
-    setTodos(apiData.data.listTodos.items);
+  async function fetchNotes() {
+    const apiData = await API.graphql({ query: listNotes });
+    setNotes(apiData.data.listNotes.items);
   }
 
-  async function createTodo() {
+  async function createNote() {
     if (!formData.name || !formData.description) return;
-    await API.graphql({ query: createTodoMutation, variables: { input: formData } });
-    setTodos([ ...todos, formData ]);
+    var res = await API.graphql({ query: createNoteMutation, variables: { input: formData } });
+    var obj = res.data.createNote;
+    setNotes([ ...notes, obj ]);
     setFormData(initialFormState);
   }
 
-  async function deleteTodo({ id }) {
-    const newTodosArray = todos.filter(todo => todo.id !== id);
-    setTodos(newTodosArray);
-    await API.graphql({ query: deleteTodoMutation, variables: { input: { id } }});
+  async function deleteNote({ id }) {
+    console.log(id);
+    await API.graphql({ query: deleteNoteMutation, variables: { input: { id } }});
+    const newNotesArray = notes.filter(note => note.id !== id);
+    setNotes(newNotesArray);    
   }
 
   return (
     <div className="App">
-      <h1>My Todos App</h1>
+      <h1>My Notes App</h1>
       <input
         onChange={e => setFormData({ ...formData, 'name': e.target.value})}
-        placeholder="Todo name"
+        placeholder="Note name"
         value={formData.name}
       />
       <input
         onChange={e => setFormData({ ...formData, 'description': e.target.value})}
-        placeholder="Todo description"
+        placeholder="Note description"
         value={formData.description}
       />
-      <button onClick={createTodo}>Create Todo</button>
+      <button onClick={createNote}>Create Note</button>
       <div style={{marginBottom: 30}}>
         {
-          todos.map(todo => (
-            <div key={todo.id || todo.name}>
-              <h2>{todo.name}</h2>
-              <p>{todo.description}</p>
-              <button onClick={() => deleteTodo(todo)}>Delete todo</button>
+          notes.map(note => (
+            <div key={note.id || note.name}>
+              <h2>{note.name}</h2>
+              <p>{note.description}</p>
+              <button onClick={() => deleteNote(note)}>Delete note</button>
             </div>
           ))
         }

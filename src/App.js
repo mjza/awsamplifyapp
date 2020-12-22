@@ -63,13 +63,12 @@ function App() {
     const file = e.target.files[0];
     setFormData({ ...formData, image: file.name });
     await Storage.put(file.name, file);
-    fetchNotes();
+    fetchNotes(); // if the item is already created the image will be add here 
   }
 
   async function onChangeSelect(e) {
     var id = e.target.value;
     setFormData({ ...formData, noteNoteTypeId: id });
-    fetchNotes();
   }
 
   return (

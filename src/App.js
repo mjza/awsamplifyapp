@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import { API, Storage } from 'aws-amplify';
+import {Auth} from '@aws-amplify/auth';
 import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
 import { listNotes, listNoteTypes } from './graphql/queries';
 import { createNote as createNoteMutation, deleteNote as deleteNoteMutation } from './graphql/mutations';
@@ -8,9 +9,16 @@ import { createNote as createNoteMutation, deleteNote as deleteNoteMutation } fr
 const initialFormState = { name: '', description: '', noteNoteTypeId: '' }
 
 function App() {
+  
+  
+  const [user, setUser] =  useState({username: ''});
   const [notes, setNotes] = useState([]);
   const [noteTypes, setNoteTypes] = useState([]);
   const [formData, setFormData] = useState(initialFormState);
+  
+  useEffect(() => {
+    fetchUser();
+  }, []);
 
   useEffect(() => {
     fetchNoteTypes();
@@ -19,6 +27,12 @@ function App() {
   useEffect(() => {
     fetchNotes();
   }, []);
+
+  async function fetchUser() {
+    await Auth.currentUserInfo().then( oUser => {
+      setUser(oUser);
+    });
+  }
 
   async function fetchNoteTypes() {
     const apiData = await API.graphql({ query: listNoteTypes });
@@ -73,6 +87,9 @@ function App() {
 
   return (
     <div className="App">
+      <div>
+        <p>{user ? user.username : ""}</p>
+      </div>
       <h1>My Notes App</h1>
       <input
         onChange={e => setFormData({ ...formData, 'name': e.target.value})}

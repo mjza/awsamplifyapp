@@ -103,6 +103,8 @@ function App() {
               <h2>{note.name}</h2>
               <p>{note.description}</p>
               <p>{note.NoteType ? note.NoteType.name : ""}</p>
+              <p>{note.createdAt}</p>
+              <p>{note.updatedAt}</p>
               <button onClick={() => deleteNote(note)}>Delete note</button>
               {
                 note.image && <img alt={note.name} src={note.image} style={{width: 400}} />

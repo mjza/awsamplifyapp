@@ -122,6 +122,7 @@ function App() {
               <p>{note.NoteType ? note.NoteType.name : ""}</p>
               <p>{note.createdAt}</p>
               <p>{note.updatedAt}</p>
+              <p>{note.owner}</p>
               <button onClick={() => deleteNote(note)}>Delete note</button>
               {
                 note.image && <img alt={note.name} src={note.image} style={{width: 400}} />

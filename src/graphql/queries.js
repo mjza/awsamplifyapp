@@ -8,14 +8,15 @@ export const getNote = /* GraphQL */ `
       name
       description
       image
-      createdAt
-      updatedAt
       NoteType {
         id
         name
         createdAt
         updatedAt
       }
+      createdAt
+      updatedAt
+      owner
     }
   }
 `;
@@ -31,16 +32,27 @@ export const listNotes = /* GraphQL */ `
         name
         description
         image
-        createdAt
-        updatedAt
         NoteType {
           id
           name
           createdAt
           updatedAt
         }
+        createdAt
+        updatedAt
+        owner
       }
       nextToken
+    }
+  }
+`;
+export const getNoteType = /* GraphQL */ `
+  query GetNoteType($id: ID!) {
+    getNoteType(id: $id) {
+      id
+      name
+      createdAt
+      updatedAt
     }
   }
 `;
@@ -58,16 +70,6 @@ export const listNoteTypes = /* GraphQL */ `
         updatedAt
       }
       nextToken
-    }
-  }
-`;
-export const getNoteType = /* GraphQL */ `
-  query GetNoteType($id: ID!) {
-    getNoteType(id: $id) {
-      id
-      name
-      createdAt
-      updatedAt
     }
   }
 `;

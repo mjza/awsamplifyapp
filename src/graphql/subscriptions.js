@@ -8,14 +8,15 @@ export const onCreateNote = /* GraphQL */ `
       name
       description
       image
-      createdAt
-      updatedAt
       NoteType {
         id
         name
         createdAt
         updatedAt
       }
+      createdAt
+      updatedAt
+      owner
     }
   }
 `;
@@ -26,14 +27,15 @@ export const onUpdateNote = /* GraphQL */ `
       name
       description
       image
-      createdAt
-      updatedAt
       NoteType {
         id
         name
         createdAt
         updatedAt
       }
+      createdAt
+      updatedAt
+      owner
     }
   }
 `;
@@ -44,14 +46,15 @@ export const onDeleteNote = /* GraphQL */ `
       name
       description
       image
-      createdAt
-      updatedAt
       NoteType {
         id
         name
         createdAt
         updatedAt
       }
+      createdAt
+      updatedAt
+      owner
     }
   }
 `;

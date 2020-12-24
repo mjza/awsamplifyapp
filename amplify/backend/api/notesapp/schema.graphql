@@ -1,19 +1,22 @@
-type Note @model @auth(rules: [{allow: owner, provider: userPools, operations: [create, update, delete, read]}, {allow: private, provider: userPools, operations: [read]}])
+type Note
+@model
+@auth(rules: [{allow: owner, provider: userPools, operations: [create, update, delete, read]}, {allow: private, provider: userPools, operations: [read]}])
 {
   id: ID!
   name: String!
   description: String
   image: String
-  NoteType: NoteType @connection,
-  owner: String,
-  createdAt: String,
-  updatedAt: String
+  NoteType: NoteType @connection
+  owner: String
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
 }
 
-type NoteType @model @auth(rules: [{allow:groups, groups:["Admin"], provider: userPools, operations:[create, update, delete, read]}, {allow: private, provider: userPools, operations: [read]}]) {
+type NoteType
+@model 
+@auth(rules: [{allow:groups, groups:["Admin"], provider: userPools, operations:[create, update, delete, read]}, {allow: private, provider: userPools, operations: [read]}]) 
+{
   id: ID!
-  name: String!,
-  createdAt: String,
-  updatedAt: String
+  name: String!
 }
  

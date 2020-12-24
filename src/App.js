@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import { API, Storage } from 'aws-amplify';
-import {Auth} from '@aws-amplify/auth';
+import { API, Storage, graphqlOperation } from 'aws-amplify';
+import { Auth } from '@aws-amplify/auth';
 import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
 import { listNotes, listNoteTypes } from './graphql/queries';
 import { createNote as createNoteMutation, deleteNote as deleteNoteMutation } from './graphql/mutations';
@@ -9,13 +9,13 @@ import { createNote as createNoteMutation, deleteNote as deleteNoteMutation } fr
 const initialFormState = { name: '', description: '', noteNoteTypeId: '' }
 
 function App() {
-  
-  
-  const [user, setUser] =  useState({username: ''});
+
+
+  const [user, setUser] = useState({ username: '' });
   const [notes, setNotes] = useState([]);
   const [noteTypes, setNoteTypes] = useState([]);
   const [formData, setFormData] = useState(initialFormState);
-  
+
   useEffect(() => {
     fetchUser();
   }, []);
@@ -29,7 +29,7 @@ function App() {
   }, []);
 
   async function fetchUser() {
-    await Auth.currentUserInfo().then( oUser => {
+    await Auth.currentUserInfo().then(oUser => {
       setUser(oUser);
     });
   }
@@ -37,12 +37,20 @@ function App() {
   async function fetchNoteTypes() {
     const apiData = await API.graphql({ query: listNoteTypes });
     var items = apiData.data.listNoteTypes.items;
-    items.splice(0, 0, {id: "", name:""});
+    items.splice(0, 0, { id: "", name: "" });
     setNoteTypes(items);
-  } 
+  }
 
   async function fetchNotes() {
-    const apiData = await API.graphql({ query: listNotes });
+    const apiData = await API.graphql(
+      graphqlOperation(listNotes, {
+        filter: { 
+          owner: {
+            eq: "mahdi.ansari@cimt-ag.de"
+          }
+         }
+      })
+    );
     const notesFromAPI = apiData.data.listNotes.items;
     await Promise.all(notesFromAPI.map(async note => {
       if (note.image) {
@@ -62,14 +70,14 @@ function App() {
       const image = await Storage.get(formData.image);
       obj.image = image;
     }
-    setNotes([ ...notes, obj ]);
+    setNotes([...notes, obj]);
     setFormData(initialFormState);
   }
 
   async function deleteNote({ id }) {
-    await API.graphql({ query: deleteNoteMutation, variables: { input: { id } }});
+    await API.graphql({ query: deleteNoteMutation, variables: { input: { id } } });
     const newNotesArray = notes.filter(note => note.id !== id);
-    setNotes(newNotesArray);    
+    setNotes(newNotesArray);
   }
 
   async function onChange(e) {
@@ -92,12 +100,12 @@ function App() {
       </div>
       <h1>My Notes App</h1>
       <input
-        onChange={e => setFormData({ ...formData, 'name': e.target.value})}
+        onChange={e => setFormData({ ...formData, 'name': e.target.value })}
         placeholder="Note name"
         value={formData.name}
       />
       <input
-        onChange={e => setFormData({ ...formData, 'description': e.target.value})}
+        onChange={e => setFormData({ ...formData, 'description': e.target.value })}
         placeholder="Note description"
         value={formData.description}
       />
@@ -113,7 +121,7 @@ function App() {
         }
       </select>
       <button onClick={createNote}>Create Note</button>
-      <div style={{marginBottom: 30}}>
+      <div style={{ marginBottom: 30 }}>
         {
           notes.map(note => (
             <div key={note.id || note.name}>
@@ -125,7 +133,7 @@ function App() {
               <p>{note.owner}</p>
               <button onClick={() => deleteNote(note)}>Delete note</button>
               {
-                note.image && <img alt={note.name} src={note.image} style={{width: 400}} />
+                note.image && <img alt={note.name} src={note.image} style={{ width: 400 }} />
               }
             </div>
           ))

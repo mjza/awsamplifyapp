@@ -4,11 +4,16 @@ type Note @model @auth(rules: [{allow: owner, provider: userPools, operations: [
   name: String!
   description: String
   image: String
-  NoteType: NoteType @connection
+  NoteType: NoteType @connection,
+  owner: String,
+  createdAt: String,
+  updatedAt: String
 }
 
 type NoteType @model @auth(rules: [{allow:groups, groups:["Admin"], provider: userPools, operations:[create, update, delete, read]}, {allow: private, provider: userPools, operations: [read]}]) {
   id: ID!
-  name: String!
+  name: String!,
+  createdAt: String,
+  updatedAt: String
 }
  

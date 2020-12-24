@@ -25,8 +25,8 @@ function App() {
   }, []);
 
   useEffect(() => {
-    fetchNotes();
-  }, []);
+    fetchNotes(user);
+  }, [user]);
 
   async function fetchUser() {
     await Auth.currentUserInfo().then(oUser => {
@@ -41,14 +41,18 @@ function App() {
     setNoteTypes(items);
   }
 
-  async function fetchNotes() {
+  async function fetchNotes(user) {
+    if (!user || !user.username || user.username.length < 0) {
+      return;
+    }
+
     const apiData = await API.graphql(
       graphqlOperation(listNotes, {
-        filter: { 
+        filter: {
           owner: {
-            eq: "mahdi.ansari@cimt-ag.de"
+            eq: user.username
           }
-         }
+        }
       })
     );
     const notesFromAPI = apiData.data.listNotes.items;

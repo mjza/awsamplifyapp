@@ -3,7 +3,7 @@ import './App.css';
 import { API, Storage, graphqlOperation } from 'aws-amplify';
 import { Auth } from '@aws-amplify/auth';
 import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
-import { listNotes, listNoteTypes } from './graphql/queries';
+import { listNotes, listNoteTypes, listNotesByUpdatedAt } from './graphql/queries';
 import { createNote as createNoteMutation, deleteNote as deleteNoteMutation } from './graphql/mutations';
 
 const initialFormState = { name: '', description: '', noteNoteTypeId: '' }
@@ -25,7 +25,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    fetchNotes(user);
+    fetchNotesByUpdatedAt(user);
   }, [user]);
 
   async function fetchUser() {
@@ -37,23 +37,31 @@ function App() {
   async function fetchNoteTypes() {
     const apiData = await API.graphql({ query: listNoteTypes });
     var items = apiData.data.listNoteTypes.items;
+    // Sort small list!
+    items.sort(function (a, b) {
+      if (a.name < b.name) { return -1; }
+      if (a.name > b.name) { return 1; }
+      return 0;
+    });
     items.splice(0, 0, { id: "", name: "" });
     setNoteTypes(items);
   }
 
+  /*
   async function fetchNotes(user) {
     if (!user || !user.username || user.username.length < 0) {
       return;
-    }
-
+    }      
     const apiData = await API.graphql(
-      graphqlOperation(listNotes, {
-        filter: {
-          owner: {
-            eq: user.username
+      graphqlOperation(listNotes,   
+        {
+          filter: {
+            owner: {
+              eq: user.username
+            }
           }
-        }
-      })
+        }      
+      )
     );
     const notesFromAPI = apiData.data.listNotes.items;
     await Promise.all(notesFromAPI.map(async note => {
@@ -65,6 +73,32 @@ function App() {
     }))
     setNotes(apiData.data.listNotes.items);
   }
+  */
+
+  async function fetchNotesByUpdatedAt(user) {
+    if (!user || !user.username || user.username.length < 0) {
+      return;
+    }
+    const apiData = await API.graphql(
+      graphqlOperation(listNotesByUpdatedAt,
+        // Sort and filter long arrays
+        {
+          owner: user.username,
+          sortDirection: 'DESC',
+          limit: 100
+        }
+      )
+    );
+    const notesFromAPI = apiData.data.listNotesByUpdatedAt.items;
+    await Promise.all(notesFromAPI.map(async note => {
+      if (note.image) {
+        const image = await Storage.get(note.image);
+        note.image = image;
+      }
+      return note;
+    }))
+    setNotes(apiData.data.listNotesByUpdatedAt.items);
+  }
 
   async function createNote() {
     if (!formData.name || !formData.description) return;
@@ -74,7 +108,7 @@ function App() {
       const image = await Storage.get(formData.image);
       obj.image = image;
     }
-    setNotes([...notes, obj]);
+    setNotes([obj, ...notes]);
     setFormData(initialFormState);
   }
 
@@ -89,7 +123,7 @@ function App() {
     const file = e.target.files[0];
     setFormData({ ...formData, image: file.name });
     await Storage.put(file.name, file);
-    fetchNotes(); // if the item is already created the image will be add here 
+    fetchNotesByUpdatedAt(user); // if the item is already created the image will be add here 
   }
 
   async function onChangeSelect(e) {

@@ -73,3 +73,39 @@ export const listNoteTypes = /* GraphQL */ `
     }
   }
 `;
+export const listNotesByUpdatedAt = /* GraphQL */ `
+  query ListNotesByUpdatedAt(
+    $owner: String
+    $updatedAt: ModelStringKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelNoteFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listNotesByUpdatedAt(
+      owner: $owner
+      updatedAt: $updatedAt
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        name
+        description
+        image
+        NoteType {
+          id
+          name
+          createdAt
+          updatedAt
+        }
+        owner
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;

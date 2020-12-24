@@ -1,5 +1,6 @@
 type Note
 @model
+@key(name: "ListNotesByUpdatedAt", fields: ["owner", "updatedAt"], queryField: "listNotesByUpdatedAt")
 @auth(rules: [{allow: owner, provider: userPools, operations: [create, update, delete, read]}, {allow: private, provider: userPools, operations: [read]}])
 {
   id: ID!
@@ -8,8 +9,8 @@ type Note
   image: String
   NoteType: NoteType @connection
   owner: String
-  createdAt: AWSDateTime!
-  updatedAt: AWSDateTime!
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
 }
 
 type NoteType
